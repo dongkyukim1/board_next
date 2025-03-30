@@ -1,0 +1,23 @@
+(1) 글목록 조회기능 만들기 --------------------------------
+
+1. 세부기능 부터 한글로 설명 
+
+-> HTML 페이지 필요
+
+-> 방문하면 DB에서 글 꺼내옴
+  const client = await MongoClient.connect(uri);
+  const db = client.db('board_next'); // ← DB 이름
+  const result = await db.collection('next').find().toArray(); // ← 모든 글 가져오기
+
+-> 글들을 HTML 에 꽂아넣기
+ 자료형에 맞게 출력해야함
+ ex) let data = {name : '김동규' , age : 20}
+ {result.map((post: any) => (
+        <div className="list-item" key={post._id.toString()}>
+          <h4>{post.title}</h4>
+          <p>{post.content}</p>
+        </div>
+      ))}
+
+      시작괄호{ } 가 있으면 array 다! 콘솔로그로 result 뽑았을떄
+2. 그거 코드로 번역

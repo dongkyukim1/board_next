@@ -8,36 +8,49 @@ if (!MONGODB_URI) {
   );
 }
 
-/**
- * 글로벌 변수에 mongoose 연결 객체를 캐싱
- */
-let cached = global as any;
-
-if (!cached.mongoose) {
-  cached.mongoose = { conn: null, promise: null };
+// mongoose 연결 객체 타입 지정
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
+// 글로벌 선언 (Next.js의 hot reload에서도 작동하게 하기 위함)
+declare global {
+   // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined;
+}
+
+// 캐시 객체 설정
+const cached: MongooseCache = globalThis.mongoose ?? {
+  conn: null,
+  promise: null,
+};
+
+// 캐시를 글로벌에 등록 (최초 1회만)
+globalThis.mongoose = cached;
+
 async function connectDB() {
-  if (cached.mongoose.conn) {
-    return cached.mongoose.conn;
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  if (!cached.mongoose.promise) {
+  if (!cached.promise) {
     const opts = {
       bufferCommands: false,
     };
+    
+    cached.promise = mongoose.connect(MONGODB_URI!, opts);
 
-    cached.mongoose.promise = mongoose.connect(MONGODB_URI!, opts);
   }
-  
+
   try {
-    cached.mongoose.conn = await cached.mongoose.promise;
+    cached.conn = await cached.promise;
   } catch (e) {
-    cached.mongoose.promise = null;
+    cached.promise = null;
     throw e;
   }
-  
-  return cached.mongoose.conn;
+
+  return cached.conn;
 }
 
-export default connectDB; 
+export default connectDB;
