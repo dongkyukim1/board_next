@@ -1,12 +1,15 @@
 import { connectDB } from "../../utils/database";
 import { ObjectId } from "mongodb";
+
 export default async function Detail(props) {
+    // params 객체를 await로 비동기 처리
+    const params = await props.params;
+    const 글번호 = params.글번호;
     
     const db = (await connectDB).db("board_next");
-    const result = (await db.collection("next").findOne({
-        _id: new ObjectId(props.params.글번호)
-
-    }))
+    const result = await db.collection("next").findOne({
+        _id: new ObjectId(글번호)
+    });
 
     return <div>
         <h4>상세페이지</h4>
