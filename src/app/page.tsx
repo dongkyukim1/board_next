@@ -1,5 +1,5 @@
-import { connectDB } from "../../util/database.js";
-import React from "react";
+import { connectDB } from "./utils/database";
+import Link from "next/link";
 import { ObjectId } from "mongodb";
 
 interface Post {
@@ -10,27 +10,26 @@ interface Post {
 }
 
 export default async function Home() {
-  const client = await connectDB;
-  
-  const db = client.db("board_next");
-  const result = await db.collection("next").find().toArray() as Post[];
-  console.log(result);
-  
+  const db = (await connectDB).db("board_next");
+  const posts = await db.collection("next").find().toArray() as Post[];
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-2xl font-bold mb-4">게시판</h1>
-      {result.length > 0 ? (
-        <ul className="space-y-2">
-          {result.map((post: Post, i: number) => (
-            <li key={i} className="border p-4 rounded-lg">
+    <div className="max-w-5xl mx-auto p-4">
+      <h1 className="text-lg font-bold text-center mb-4">독서 게시판</h1>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        {posts.map((post) => (
+          <div key={post._id?.toString()} className="border p-3 rounded">
+            <Link href={`/detail/${post._id}`}>
               <h2 className="font-bold">{post.title}</h2>
-              <p>{post.content}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>게시물이 없습니다.</p>
-      )}
+            </Link>
+            <p className="text-sm line-clamp-2">{post.content}</p>
+            {post.date && <small>{new Date(post.date).toLocaleDateString()}</small>}
+          </div>
+        ))}
+      </div>
+      
+      {posts.length === 0 && <p className="text-center">게시물이 없습니다</p>}
     </div>
   );
 }
