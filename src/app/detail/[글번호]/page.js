@@ -8,7 +8,7 @@ export default async function Detail(props) {
     
     const db = (await connectDB).db("board_next");
     const result = await db.collection("next").findOne({
-        _id: new ObjectId(글번호)
+        _id: new ObjectId(글번호)            
     });
 
     return <div>
