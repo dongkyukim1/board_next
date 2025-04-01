@@ -1,0 +1,37 @@
+push 로 페이지 이동
+(1)
+
+'use client'
+
+import { useRouter } from 'next/navigation'
+export default function DetailLink() {
+    const router = useRouter()
+    return (
+        
+            <button onClick={() => router.push(`/`)}>상세페이지</button>
+  
+    )
+}
+
+
+(2) 뒤로 가기 , 앞으로가기 , 소프트 새로고침
+
+
+<button onClick={() => router.back()}>뒤로가기</button>
+<button onClick={() => router.forward()}>앞으로가기</button>
+<button onClick={() => router.refresh()}>소프트새로고침</button>
+
+(3)pretech => 빠른로드로 가기 
+  
+<button onClick={() => router.pretech()}>빠르게 이동하기 </button> 
+* link는 자동으로 prefetch 기 때문에 굳이?..
+<-> 그럼 모든걸 link 하면 다 프리패치인데? 적당히써라!
+
+*개발중일땐 prefetch 확인불가 prefetch={false} 로 설정가능 
+
+*client component 에서만 한다.
+
+총정리
+
+여러페이지 만들거면 다이나믹라우팅
+현재 url 이 궁금하면 props/useRouter
