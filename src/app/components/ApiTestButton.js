@@ -3,47 +3,42 @@
 import { useState } from 'react';
 
 export default function ApiTestButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [result, setResult] = useState('');
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = {
-      title: formData.get('title'),
-      content: formData.get('content')
-    };
-    
-    try {
-      const res = await fetch('/api/write', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const json = await res.json();
-      setResult('저장 완료: ' + json.id);
-      event.target.reset();
-      setIsOpen(false);
-    } catch (e) {
-      setResult('오류 발생');
-    }
-  }
+  const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState('');
 
   return (
-    <div>
-      <button onClick={() => setIsOpen(!isOpen)} className="bg-green-500 text-white p-2 rounded">
-        {isOpen ? '닫기' : 'API 테스트'}
+    <>
+      <button onClick={() => setOpen(!open)} className="bg-green-500 text-white p-2 rounded">
+        {open ? '닫기' : '글쓰기'}
       </button>
       
-      {isOpen && (
-        <form onSubmit={handleSubmit} className="mt-2 p-2 border rounded">
-          <input name="title" placeholder="제목" className="w-full p-1 border mb-2" required />
-          <textarea name="content" placeholder="내용" className="w-full p-1 border mb-2" rows="2" required />
-          <button type="submit" className="bg-blue-500 text-white p-1 rounded">저장</button>
+      {open && (
+        <form onSubmit={async e => {
+          e.preventDefault();
+          try {
+            const res = await fetch('/api/write', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                title: e.target.title.value,
+                content: e.target.content.value
+              })
+            });
+            const data = await res.json();
+            setMsg('완료: ' + data.id);
+            e.target.reset();
+            setOpen(false);
+          } catch {
+            setMsg('오류');
+          }
+        }} className="mt-2 p-2 border">
+          <input name="title" placeholder="제목" className="w-full mb-2 border p-1" required />
+          <textarea name="content" placeholder="내용" className="w-full mb-2 border p-1" rows="2" required />
+          <button className="bg-blue-500 text-white p-1 rounded">저장</button>
         </form>
       )}
       
-      {result && <p className="text-sm mt-1">{result}</p>}
-    </div>
+      {msg && <p className="text-sm">{msg}</p>}
+    </>
   );
 } 
