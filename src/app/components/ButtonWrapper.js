@@ -2,6 +2,7 @@
 
 import ListLink from '../list/listlink.js';
 import Link from 'next/link';
+import ApiTestButton from './ApiTestButton';
 
 export default function ButtonWrapper() {
   return (
@@ -11,6 +12,7 @@ export default function ButtonWrapper() {
           글쓰기
         </button>
       </Link>
+      <ApiTestButton />
       <br></br>
       <br></br>
       <ListLink />
